@@ -1,37 +1,38 @@
 OBJECTS=action_impl.o advent.o input_map.o input.o system.o text.o player.o map.o
 CXX=g++
+LIBS=./SDL2/lib
 CXXFLAGS=-std=c++2a -Wall -Wextra -pedantic -Wshadow -Wconversion -Werror=vla -Werror=return-type -Wno-deprecated-copy -Wno-multichar -g
+LINK=-lmingw32 -lSDL2main -lSDL2 -lSDL2_ttf
 
 all: clean advent
-	@rm *.o -f
 	@clear
 
 advent: $(OBJECTS)
-	$(CXX) $(CXXFLAGS) -lcurses $(OBJECTS) -o advent -lncursesw
+	$(CXX) $(CXXFLAGS) -L $(LIBS) $(OBJECTS) -o advent $(LINK)
 
 action_impl.o:
-	$(CXX) $(CXXFLAGS) -lcurses action_impl.cpp -c
+	$(CXX) $(CXXFLAGS) -L $(LIBS) action_impl.cpp -c
 
 advent.o:
-	$(CXX) $(CXXFLAGS) -lcurses advent.cpp -c
+	$(CXX) $(CXXFLAGS) -L $(LIBS) advent.cpp -c
 
 input_map.o:
-	$(CXX) $(CXXFLAGS) -lcurses input_map.cpp -c
+	$(CXX) $(CXXFLAGS) -L $(LIBS) input_map.cpp -c
 
 input.o:
-	$(CXX) $(CXXFLAGS) -lcurses input.cpp -c
+	$(CXX) $(CXXFLAGS) -L $(LIBS) input.cpp -c
 
 system.o:
-	$(CXX) $(CXXFLAGS) -lcurses system.cpp -c
+	$(CXX) $(CXXFLAGS) -L $(LIBS) system.cpp -c
 
 text.o:
-	$(CXX) $(CXXFLAGS) -lcurses text.cpp -c
+	$(CXX) $(CXXFLAGS) -L $(LIBS) text.cpp -c
 
 player.o:
-	$(CXX) $(CXXFLAGS) -lcurses player.cpp -c
+	$(CXX) $(CXXFLAGS) -L $(LIBS) player.cpp -c
 
 map.o:
-	$(CXX) $(CXXFLAGS) -lcurses map.cpp -c
+	$(CXX) $(CXXFLAGS) -L $(LIBS) map.cpp -c
 
 clean:
 	@rm *.o advent -f

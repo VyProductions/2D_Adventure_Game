@@ -2,10 +2,10 @@
 #define TYPES_H
 
 #include <algorithm>
+#include <array>
 #include <chrono>
 #include <codecvt>
 #include <cstdlib>
-#include <curses.h>
 #include <fstream>
 #include <iostream>
 #include <list>
@@ -13,6 +13,9 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
+
+#include "SDL2/include/SDL2/SDL.h"
+#include "SDL2/include/SDL2/SDL_ttf.h"
 
 enum state_t {
     UNKNOWN, DIALOG, TEXT_PROMPT, OPTION_PROMPT, PLAYER_CONTROL
@@ -28,8 +31,6 @@ public:
 
     void open() {
         logfile.open("log.txt", std::ios::out | std::ios::trunc);
-        std::locale mylocale("");   // get global locale
-        logfile.imbue(mylocale);    // Resolve weird issue with wofstream
         origin = std::chrono::high_resolution_clock::now();
     }
 
@@ -41,26 +42,26 @@ public:
     void _log(const T& msg) {
         now = std::chrono::high_resolution_clock::now();
         auto diff = std::chrono::duration_cast<std::chrono::microseconds>(now - origin);
-        logfile << L"[" << ftick(diff.count()) << L"] " << msg << std::endl;
+        logfile << "[" << ftick(diff.count()) << "] " << msg << std::endl;
     }
 private:
-    std::wstring ftick(int64_t ticks) {
-        std::wstring h  = std::to_wstring(ticks / (3'600'000'000));
-        std::wstring m  = std::to_wstring((ticks % 3'600'000'000) / 60'000'000);
-        std::wstring s  = std::to_wstring((ticks % 60'000'000) / 1'000'000);
-        std::wstring us = std::to_wstring((ticks % 1'000'000));
-        h = std::wstring(9 - h.length(), '0') + h;
-        m = std::wstring(2 - m.length(), '0') + m;
-        s = std::wstring(2 - s.length(), '0') + s;
-        us = std::wstring(6 - us.length(), '0') + us;
+    std::string ftick(int64_t ticks) {
+        std::string h  = std::to_string(ticks / (3'600'000'000));
+        std::string m  = std::to_string((ticks % 3'600'000'000) / 60'000'000);
+        std::string s  = std::to_string((ticks % 60'000'000) / 1'000'000);
+        std::string us = std::to_string((ticks % 1'000'000));
+        h = std::string(9 - h.length(), '0') + h;
+        m = std::string(2 - m.length(), '0') + m;
+        s = std::string(2 - s.length(), '0') + s;
+        us = std::string(6 - us.length(), '0') + us;
 
-        return h + L':' + m + L':' + s + L'.' + us;
+        return h + ':' + m + ':' + s + '.' + us;
     }
 
     tick_t origin;
     tick_t now;
 
-    std::wofstream logfile;
+    std::ofstream logfile;
 };
 
 struct message_t {
@@ -94,38 +95,49 @@ enum dir_t {
 };
 
 struct player_t {
-    std::wstring player_name;
+    std::string player_name;
     int health;
     int cash;
     vec2_t position;
     vec2_t spawn_point;
     dir_t look_direction;
-    std::wstring icon() {
-        std::wstring ic;
+
+    std::string icon() {
+        std::string ic;
+
         switch (look_direction) {
-            case UP:         ic = L"\u2191"; break;
-            case LEFT:       ic = L"\u2190"; break;
-            case DOWN:       ic = L"\u2193"; break;
-            case RIGHT:      ic = L"\u2192"; break;
-            case UP_LEFT:    ic = L"\u2196"; break;
-            case UP_RIGHT:   ic = L"\u2197"; break;
-            case DOWN_LEFT:  ic = L"\u2199"; break;
-            case DOWN_RIGHT: ic = L"\u2198"; break;
-            default:         ic = L"?";      break;
+            case UP:         ic = icons.at(0); break;
+            case LEFT:       ic = icons.at(1); break;
+            case DOWN:       ic = icons.at(2); break;
+            case RIGHT:      ic = icons.at(3); break;
+            case UP_LEFT:    ic = icons.at(4); break;
+            case UP_RIGHT:   ic = icons.at(5); break;
+            case DOWN_LEFT:  ic = icons.at(6); break;
+            case DOWN_RIGHT: ic = icons.at(7); break;
+            default:         ic = "";      break;
         }
 
         return ic;
     }
+
+    std::array<std::string, 8> icons;
+    SDL_Rect spriteRect;
+    SDL_Surface* spriteSurface;
+    SDL_Texture* spriteTexture;
 };
 
 struct object_t {
     std::string name;
-    std::wstring icon;
 };
 
 typedef std::unordered_map<
-    int,            // Input keycode value
-    void (*)(void)  // Function for that input given the program context
+    // Input key event
+    SDL_Scancode,
+    // Function for that input given the program context
+    std::pair<void (*)(void), void (*)(void)>
 > keybind_t;
+
+#define WIND_WIDTH 1000
+#define WIND_HEIGHT 700
 
 #endif

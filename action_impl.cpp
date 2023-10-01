@@ -1,6 +1,6 @@
 #include "proto.h"
 
-extern int nrows, ncols;
+extern SDL_Renderer* renderer;
 extern player_t player;
 extern std::unordered_map<
     std::string,
@@ -13,7 +13,7 @@ std::unordered_map<
 > func_map = {
     {
         "ADVANCE_DIALOG", [](void) {
-            log(L"Advancing dialog...");
+            log("Advancing dialog...");
         }
     }, {
         "EXIT", [](void) {
@@ -22,91 +22,65 @@ std::unordered_map<
         }
     }, {
         "MOVE_UP", [](void) {
-            log(L"Move up...");
+            log("Move up...");
 
-            player.look_direction = UP;
+            if (player.look_direction != UP) {
+                player.look_direction = UP;
+
+                // Reallocate player icon to struct
+                SDL_FreeSurface(player.spriteSurface);
+                SDL_DestroyTexture(player.spriteTexture);
+                player.spriteSurface = SDL_LoadBMP(player.icon().c_str());
+                player.spriteTexture = SDL_CreateTextureFromSurface(
+                    renderer, player.spriteSurface
+                );
+            }
 
             if (player.position.y > 0) {
                 map_set[player.position()].pop_back();
                 --player.position.y;
+                --player.spriteRect.y;
                 map_set[player.position()].push_back(
-                    {"Player", player.icon()}
+                    {player.player_name}
                 );
             }
-        }
-    }, {
-        "TURN_UP", [](void) {
-            log(L"Turn up...");
-
-            player.look_direction = UP;
-            map_set[player.position()].back().icon = player.icon();
         }
     }, {
         "MOVE_LEFT", [](void) {
-            log(L"Move left...");
-
-            player.look_direction = LEFT;
-
-            if (player.position.x > 0) {
-                map_set[player.position()].pop_back();
-                player.position.x -= 2;
-                map_set[player.position()].push_back(
-                    {"Player", player.icon()}
-                );
-            }
-        }
-    }, {
-        "TURN_LEFT", [](void) {
-            log(L"Turn left...");
-
-            player.look_direction = LEFT;
-            map_set[player.position()].back().icon = player.icon();
+            log("Move left...");
         }
     }, {
         "MOVE_DOWN", [](void) {
-            log(L"Move down...");
+            log("Move down...");
 
-            player.look_direction = DOWN;
+            if (player.look_direction != DOWN) {
+                player.look_direction = DOWN;
 
-            if (player.position.y < nrows - 1) {
-                map_set[player.position()].pop_back();
-                ++player.position.y;
-                map_set[player.position()].push_back(
-                    {"Player", player.icon()}
+                // Reallocate player icon to struct
+                SDL_FreeSurface(player.spriteSurface);
+                SDL_DestroyTexture(player.spriteTexture);
+                player.spriteSurface = SDL_LoadBMP(player.icon().c_str());
+                player.spriteTexture = SDL_CreateTextureFromSurface(
+                    renderer, player.spriteSurface
                 );
             }
-        }
-    }, {
-        "TURN_DOWN", [](void) {
-            log(L"Turn down...");
 
-            player.look_direction = DOWN;
-            map_set[player.position()].back().icon = player.icon();
+            if (player.position.y < WIND_HEIGHT - 65) {
+                map_set[player.position()].pop_back();
+                ++player.position.y;
+                ++player.spriteRect.y;
+                map_set[player.position()].push_back(
+                    {player.player_name}
+                );
+            }
         }
     }, {
         "MOVE_RIGHT", [](void) {
-            log(L"Move right...");
-
-            player.look_direction = RIGHT;
-
-            if (player.position.x < ncols - (ncols % 2 == 0 ? 2 : 3)) {
-                map_set[player.position()].pop_back();
-                player.position.x += 2;
-                map_set[player.position()].push_back(
-                    {"Player", player.icon()}
-                );
-            }
-        }
-    }, {
-        "TURN_RIGHT", [](void) {
-            log(L"Turn right...");
-
-            player.look_direction = RIGHT;
-            map_set[player.position()].back().icon = player.icon();
+            log("Move right...");
         }
     }, {
         "INTERACT", [](void) {
-            log(L"Interacting...");
+            log("Interacting...");
         }
     }, {
         "RESPAWN", [](void) {

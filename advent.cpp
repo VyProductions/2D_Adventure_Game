@@ -1,37 +1,33 @@
 #include "proto.h"
 
-#define UP      279165
-#define DOWN    279166
-#define RIGHT   279167
-#define LEFT    279168
-#define RESIZE  410
+extern bool running;
+extern SDL_Renderer* renderer;
 
-extern bool running;      // Whether application should continue or not
+int main(int argc, char** argv) {
+    if (sys_start() != 0) return 0;
 
-using namespace std::chrono_literals;
+    SDL_Event event;
 
-int main() {
-    int ch;  // Keycode value
-
-    sys_start();
-
-    // Game Loop
     while (running) {
-        ch = get_ch();
-
-        switch (ch) {
-            case RESIZE:
-                resized();
-                break;
-            case ERR:  // No input entered
-                break;
-            default:  // Unrecognized input, try to process it
-                process_input(ch);
-                break;
+        while (SDL_PollEvent(&event)) {
+            if (
+                (event.type == SDL_KEYDOWN || event.type == SDL_KEYUP) &&
+                event.key.repeat == 0  // Not a repeat keypress
+            ) {
+                process_keypress(event.key);
+            } else if (event.type == SDL_MOUSEBUTTONDOWN) {
+                std::cout << '(' << event.button.x << ", " << event.button.y << ") Clicked..." << std::endl;
+            } else if (event.type == SDL_MOUSEBUTTONUP) {
+                std::cout << '(' << event.button.x << ", " << event.button.y << ") Released..." << std::endl;
+            }
         }
 
-        draw_display();
+        SDL_RenderClear(renderer);
+        DrawScreen();
+        SDL_RenderPresent(renderer);
     }
 
     sys_exit();
+
+    return 0;
 }

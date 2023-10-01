@@ -12,29 +12,22 @@ extern Console console;
 // Functions *******************************************************************
 
 // System
-void sys_start();
+int sys_start();
 void sys_exit();
 std::string state_name(const state_t& name);
-std::wstring state_wname(const state_t& name);
 void resized();
+void DrawScreen();
 
 // Input
-int get_ch();
-void process_input(int keycode);
+void process_keypress(const SDL_KeyboardEvent& event);
 
 // Input Map
 void read_inputmap();
 
 // Text
 void print_msg(const message_t& msg);
-std::vector<int> vec_fmt(const std::wstring& str, int fmt_flags = 0);
-std::list<std::vector<int> > word_fmt(const std::wstring& str, int fmt_flags = 0);
-std::wstring vec_str(std::vector<int> word);
 
 // Player
 void respawn();
-
-// Map
-void draw_display();
 
 #endif
