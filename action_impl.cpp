@@ -38,8 +38,7 @@ std::unordered_map<
 
             if (player.position.y > 0) {
                 map_set[player.position()].pop_back();
-                --player.position.y;
-                --player.spriteRect.y;
+                player.velocity.y = -1;
                 map_set[player.position()].push_back(
                     {player.player_name}
                 );
@@ -67,8 +66,7 @@ std::unordered_map<
 
             if (player.position.y < WIND_HEIGHT - 65) {
                 map_set[player.position()].pop_back();
-                ++player.position.y;
-                ++player.spriteRect.y;
+                player.velocity.y = 1;
                 map_set[player.position()].push_back(
                     {player.player_name}
                 );

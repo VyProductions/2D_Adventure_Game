@@ -56,13 +56,13 @@ int sys_start() {
     }
 
     window = SDL_CreateWindow(
-        "2D Adventure Game", 0, 0, 1000, 700,
-        SDL_WINDOW_FULLSCREEN_DESKTOP | SDL_WINDOW_INPUT_GRABBED
+        "2D Adventure Game", 0, 0, 1000, 700, 0
+        // SDL_WINDOW_FULLSCREEN_DESKTOP | SDL_WINDOW_INPUT_GRABBED
     );
 
     renderer = SDL_CreateRenderer(window, -1, 0);
 
-    SDL_Rect background = {
+    background = {
         0,           // top left x
         0,           // top left y
         WIND_WIDTH,  // rect width
@@ -125,4 +125,9 @@ void DrawScreen() {
     // Draw player
     SDL_RenderCopy(renderer, player.spriteTexture, NULL, &player.spriteRect);
     SDL_RenderPresent(renderer);
+}
+
+void Update(double deltaTime) {
+    // Update player position based on velocity
+    log(deltaTime);
 }

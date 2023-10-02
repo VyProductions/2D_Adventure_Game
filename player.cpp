@@ -2,7 +2,7 @@
 
 const vec2_t SPAWN_POINT = {0, 0};
 
-player_t player {"Bob", 100, 0, {0, 0}, SPAWN_POINT, UP, {
+player_t player {"Bob", 100, 0, {0, 0}, {0, 0}, SPAWN_POINT, UP, {
         "BMPs/Temp_Player_Up.bmp",
         "BMPs/Temp_Player_Left.bmp",
         "BMPs/Temp_Player_Down.bmp",

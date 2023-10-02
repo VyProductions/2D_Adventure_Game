@@ -99,6 +99,7 @@ struct player_t {
     int health;
     int cash;
     vec2_t position;
+    vec2_t velocity;
     vec2_t spawn_point;
     dir_t look_direction;
 

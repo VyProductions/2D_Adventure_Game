@@ -17,6 +17,7 @@ void sys_exit();
 std::string state_name(const state_t& name);
 void resized();
 void DrawScreen();
+void Update(double deltaTime);
 
 // Input
 void process_keypress(const SDL_KeyboardEvent& event);
