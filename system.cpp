@@ -129,5 +129,22 @@ void DrawScreen() {
 
 void Update(double deltaTime) {
     // Update player position based on velocity
-    log(deltaTime);
+    if (
+        (player.velocity.y < 0 && player.spriteRect.y > 0) ||
+        (player.velocity.y > 0 && player.spriteRect.y < WIND_HEIGHT - 64) ||
+        (player.velocity.x < 0 && player.spriteRect.x > 0) ||
+        (player.velocity.x > 0 && player.spriteRect.x < WIND_WIDTH - 64)
+    ) {
+        player.position += player.velocity * deltaTime;
+
+        log(player.position.x);
+        log(player.position.y);
+
+        map_set[player._position()()].pop_back();
+        player.spriteRect.x = SDL_round(player.position.x);
+        player.spriteRect.y = SDL_round(player.position.y);
+        map_set[player._position()()].push_back(
+            {player.player_name}
+        );
+    }
 }

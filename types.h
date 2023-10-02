@@ -78,8 +78,8 @@ struct message_t {
 };
 
 struct vec2_t {
-    int64_t x;  // (-) = left ; (+) = right
-    int64_t y;  // (-) = up   ; (+) = down
+    long double x;  // (-) = left ; (+) = right
+    long double y;  // (-) = up   ; (+) = down
 
     bool operator==(const vec2_t rhs) const {
         return x == rhs.x && y == rhs.y;
@@ -87,6 +87,19 @@ struct vec2_t {
 
     std::string operator()() {
         return std::to_string(x) + ',' + std::to_string(y);
+    }
+
+    vec2_t& operator*(double multi) {
+        x *= multi;
+        y *= multi;
+
+        return *this;
+    }
+
+    vec2_t& operator+=(const vec2_t& rhs) {
+        x += rhs.x;
+        y += rhs.y;
+        return *this;
     }
 };
 
@@ -119,6 +132,10 @@ struct player_t {
         }
 
         return ic;
+    }
+
+    vec2_t _position() {
+        return {SDL_round(position.x), SDL_round(position.y)};
     }
 
     std::array<std::string, 8> icons;

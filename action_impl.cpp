@@ -36,17 +36,11 @@ std::unordered_map<
                 );
             }
 
-            if (player.position.y > 0) {
-                map_set[player.position()].pop_back();
-                player.velocity.y = -1;
-                map_set[player.position()].push_back(
-                    {player.player_name}
-                );
-            }
+            player.velocity.y = -1;
         }
     }, {
-        "MOVE_LEFT", [](void) {
-            log("Move left...");
+        "CANCEL_UP", [](void) {
+            log("Stop moving up...");
         }
     }, {
         "MOVE_DOWN", [](void) {
@@ -64,17 +58,11 @@ std::unordered_map<
                 );
             }
 
-            if (player.position.y < WIND_HEIGHT - 65) {
-                map_set[player.position()].pop_back();
-                player.velocity.y = 1;
-                map_set[player.position()].push_back(
-                    {player.player_name}
-                );
-            }
+            player.velocity.y = 1;
         }
     }, {
-        "MOVE_RIGHT", [](void) {
-            log("Move right...");
+        "CANCEL_DOWN", [](void) {
+            log("Stop moving down...");
         }
     }, {
         "INTERACT", [](void) {
