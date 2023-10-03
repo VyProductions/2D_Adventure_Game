@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <array>
 #include <chrono>
+#include <cmath>
 #include <codecvt>
 #include <cstdlib>
 #include <fstream>
@@ -42,7 +43,8 @@ public:
     void _log(const T& msg) {
         now = std::chrono::high_resolution_clock::now();
         auto diff = std::chrono::duration_cast<std::chrono::microseconds>(now - origin);
-        logfile << "[" << ftick(diff.count()) << "] " << msg << std::endl;
+        // logfile << "[" << ftick(diff.count()) << "] " << msg << std::endl;
+        std::cout << "[" << ftick(diff.count()) << "] " << msg << std::endl;
     }
 private:
     std::string ftick(int64_t ticks) {
@@ -89,17 +91,26 @@ struct vec2_t {
         return std::to_string(x) + ',' + std::to_string(y);
     }
 
-    vec2_t& operator*(double multi) {
-        x *= multi;
-        y *= multi;
+    vec2_t operator*(double multi) {
 
-        return *this;
+        return {x * multi, y * multi};
+    }
+
+    vec2_t operator+(const vec2_t& rhs) {
+        return {x + rhs.x, y + rhs.y};
     }
 
     vec2_t& operator+=(const vec2_t& rhs) {
         x += rhs.x;
         y += rhs.y;
         return *this;
+    }
+
+    vec2_t normalize() {
+        return {
+            x / sqrt(x * x + y * y),
+            y / sqrt(x * x + y * y)
+        };
     }
 };
 
@@ -115,6 +126,7 @@ struct player_t {
     vec2_t velocity;
     vec2_t spawn_point;
     dir_t look_direction;
+    double speed;
 
     std::string icon() {
         std::string ic;
@@ -135,7 +147,7 @@ struct player_t {
     }
 
     vec2_t _position() {
-        return {SDL_round(position.x), SDL_round(position.y)};
+        return {(int)(position.x + 0.5), (int)(position.y + 0.5)};
     }
 
     std::array<std::string, 8> icons;

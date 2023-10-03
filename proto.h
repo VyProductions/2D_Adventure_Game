@@ -17,6 +17,9 @@ void sys_exit();
 std::string state_name(const state_t& name);
 void resized();
 void DrawScreen();
+bool pt_in_rect(vec2_t point, const SDL_Rect& rect);
+bool pt_in_rectX(vec2_t point, const SDL_Rect& rect);
+bool pt_in_rectY(vec2_t point, const SDL_Rect& rect);
 void Update(double deltaTime);
 
 // Input

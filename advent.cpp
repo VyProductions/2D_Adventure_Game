@@ -22,9 +22,15 @@ int main(int argc, char** argv) {
             ) {
                 process_keypress(event.key);
             } else if (event.type == SDL_MOUSEBUTTONDOWN) {
-                std::cout << '(' << event.button.x << ", " << event.button.y << ") Clicked..." << std::endl;
+                log(
+                    std::string{"("} + std::to_string(event.button.x) + ", " +
+                    std::to_string(event.button.y) + ") Clicked..."
+                );
             } else if (event.type == SDL_MOUSEBUTTONUP) {
-                std::cout << '(' << event.button.x << ", " << event.button.y << ") Released..." << std::endl;
+                log(
+                    std::string{"("} + std::to_string(event.button.x) + ", " +
+                    std::to_string(event.button.y) + ") Released..."
+                );
             }
         }
 
@@ -36,11 +42,10 @@ int main(int argc, char** argv) {
         if ((double)micro_ticks / 1e6 >= 1 / FPS) {
             Update((double)micro_ticks / 1e6);
             begin = std::chrono::high_resolution_clock::now();
+            SDL_RenderClear(renderer);
+            DrawScreen();
+            SDL_RenderPresent(renderer);
         }
-
-        SDL_RenderClear(renderer);
-        DrawScreen();
-        SDL_RenderPresent(renderer);
     }
 
     sys_exit();

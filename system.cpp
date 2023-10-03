@@ -51,12 +51,12 @@ int sys_start() {
     log("[Application Start]");
 
     if (SDL_Init(SDL_INIT_VIDEO) != 0) {
-        std::cout << "Error initializing SDL: " << SDL_GetError() << std::endl;
+        log(std::string{"Error initializing SDL: "} + SDL_GetError());
         return -1;  // Error
     }
 
     window = SDL_CreateWindow(
-        "2D Adventure Game", 0, 0, 1000, 700, 0
+        "2D Adventure Game", 200, 100, 1000, 700, 0
         // SDL_WINDOW_FULLSCREEN_DESKTOP | SDL_WINDOW_INPUT_GRABBED
     );
 
@@ -80,11 +80,6 @@ int sys_start() {
     // Create texture from player icon
     player.spriteTexture = SDL_CreateTextureFromSurface(
         renderer, player.spriteSurface
-    );
-
-    // Put player into map
-    map_set[player.position()].push_back(
-        {"Player"}
     );
 
     // Render player sprite
@@ -127,24 +122,39 @@ void DrawScreen() {
     SDL_RenderPresent(renderer);
 }
 
+bool pt_in_rectX(vec2_t point, const SDL_Rect& rect) {
+    return point.x >= rect.x && point.x < rect.x + rect.w;
+}
+
+bool pt_in_rectY(vec2_t point, const SDL_Rect& rect) {
+    return point.y >= rect.y && point.y < rect.y + rect.h;
+}
+
+bool pt_in_rect(vec2_t point, const SDL_Rect& rect) {
+    return point.x >= rect.x && point.x < rect.x + rect.w &&
+           point.y >= rect.y && point.y < rect.y + rect.h;
+}
+
 void Update(double deltaTime) {
     // Update player position based on velocity
+    vec2_t new_pos = player.position + player.velocity.normalize() * player.speed * deltaTime;
+    SDL_Rect boundary = {0, 0, WIND_WIDTH - 64, WIND_HEIGHT - 64};
     if (
-        (player.velocity.y < 0 && player.spriteRect.y > 0) ||
-        (player.velocity.y > 0 && player.spriteRect.y < WIND_HEIGHT - 64) ||
-        (player.velocity.x < 0 && player.spriteRect.x > 0) ||
-        (player.velocity.x > 0 && player.spriteRect.x < WIND_WIDTH - 64)
+        pt_in_rect(new_pos, boundary)
     ) {
-        player.position += player.velocity * deltaTime;
+        player.position += player.velocity.normalize() * player.speed * deltaTime;
 
-        log(player.position.x);
-        log(player.position.y);
+        player.spriteRect.x = (int)(player.position.x + 0.5);
+        player.spriteRect.y = (int)(player.position.y + 0.5);
+    } else if (pt_in_rectX(new_pos, boundary)) {
+        player.position.x += player.velocity.normalize().x * player.speed * deltaTime;
 
-        map_set[player._position()()].pop_back();
-        player.spriteRect.x = SDL_round(player.position.x);
-        player.spriteRect.y = SDL_round(player.position.y);
-        map_set[player._position()()].push_back(
-            {player.player_name}
-        );
+        player.spriteRect.x = (int)(player.position.x + 0.5);
+        player.spriteRect.y = (int)(player.position.y + 0.5);
+    } else if (pt_in_rectY(new_pos, boundary)) {
+        player.position.y += player.velocity.normalize().y * player.speed * deltaTime;
+
+        player.spriteRect.x = (int)(player.position.x + 0.5);
+        player.spriteRect.y = (int)(player.position.y + 0.5);
     }
 }
