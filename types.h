@@ -16,7 +16,6 @@
 #include <vector>
 
 #include "SDL2/include/SDL2/SDL.h"
-#include "SDL2/include/SDL2/SDL_ttf.h"
 
 enum state_t {
     UNKNOWN, DIALOG, TEXT_PROMPT, OPTION_PROMPT, PLAYER_CONTROL
