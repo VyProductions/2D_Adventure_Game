@@ -87,7 +87,7 @@ struct vec2_t {
     }
 
     std::string operator()() {
-        return std::to_string(x) + ',' + std::to_string(y);
+        return std::to_string((int)(x + 0.5)) + ',' + std::to_string((int)(y + 0.5));
     }
 
     vec2_t operator*(double multi) {
@@ -117,13 +117,10 @@ enum dir_t {
     NIL, UP, LEFT, DOWN, RIGHT, UP_LEFT, UP_RIGHT, DOWN_LEFT, DOWN_RIGHT
 };
 
-struct player_t {
-    std::string player_name;
-    int health;
-    int cash;
+struct object_t {
+    std::string name;
     vec2_t position;
     vec2_t velocity;
-    vec2_t spawn_point;
     dir_t look_direction;
     double speed;
 
@@ -155,8 +152,10 @@ struct player_t {
     SDL_Texture* spriteTexture;
 };
 
-struct object_t {
-    std::string name;
+struct player_t : public object_t {
+    int health;
+    int cash;
+    vec2_t spawn_point;
 };
 
 typedef std::unordered_map<

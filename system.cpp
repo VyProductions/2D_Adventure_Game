@@ -82,10 +82,6 @@ int sys_start() {
         renderer, player.spriteSurface
     );
 
-    // Render player sprite
-    SDL_RenderCopy(renderer, player.spriteTexture, NULL, &player.spriteRect);
-    SDL_RenderPresent(renderer);
-
     return 0;
 }
 
@@ -95,6 +91,14 @@ void sys_exit() {
     // Free player resources
     SDL_FreeSurface(player.spriteSurface);
     SDL_DestroyTexture(player.spriteTexture);
+
+    // Free all object resources
+    for (auto& [position, obj_list] : map_set) {
+        for (auto& obj : obj_list) {
+            SDL_FreeSurface(obj.spriteSurface);
+            SDL_DestroyTexture(obj.spriteTexture);
+        }
+    }
 
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
@@ -116,9 +120,17 @@ void resized() {
 
 void DrawScreen() {
     // Draw background elements
+    for (auto& [position, obj_list] : map_set) {
+        for (auto& obj : obj_list) {
+            // Draw individual object
+            SDL_RenderCopy(renderer, obj.spriteTexture, NULL, &obj.spriteRect);
+        }
+    }
 
     // Draw player
     SDL_RenderCopy(renderer, player.spriteTexture, NULL, &player.spriteRect);
+
+    // Present render data
     SDL_RenderPresent(renderer);
 }
 

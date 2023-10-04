@@ -32,6 +32,5 @@ void read_inputmap();
 void print_msg(const message_t& msg);
 
 // Player
-void respawn();
 
 #endif

@@ -266,7 +266,54 @@ std::unordered_map<
         }
     }, {
         "RESPAWN", [](void) {
-            respawn();
+            log(player.name + " was respawned...");
+
+            player.position = player.spawn_point;
+            player.look_direction = !pressed_arr[_UP] && !pressed_arr[_DOWN] &&
+                !pressed_arr[_LEFT] && !pressed_arr[_RIGHT] ?
+                UP : player.look_direction;
+            player.spriteRect.x = (int)(player.position.x + 0.5);
+            player.spriteRect.y = (int)(player.position.y + 0.5);
+            
+            // Reallocate player icon to struct
+            SDL_FreeSurface(player.spriteSurface);
+            SDL_DestroyTexture(player.spriteTexture);
+            player.spriteSurface = SDL_LoadBMP(player.icon().c_str());
+            player.spriteTexture = SDL_CreateTextureFromSurface(
+                renderer, player.spriteSurface
+            );
+        }
+    }, {
+        "PLACE_ORB", [](void) {
+            log("Placing orb...");
+
+            // Generate random valid screen position (rounded to int coords)
+            vec2_t pos = {
+                rand() % (WIND_WIDTH - 32),
+                rand() % (WIND_HEIGHT - 32)
+            };
+
+            // Create object
+            object_t orb {"Orb", pos, {0, 0}, UP, 0.0, {
+                    "BMPs/Red_Orb.bmp",
+                    "BMPs/Red_Orb.bmp",
+                    "BMPs/Red_Orb.bmp",
+                    "BMPs/Red_Orb.bmp",
+                    "BMPs/Red_Orb.bmp",
+                    "BMPs/Red_Orb.bmp",
+                    "BMPs/Red_Orb.bmp",
+                    "BMPs/Red_Orb.bmp"
+                }, {pos.x, pos.y, 32, 32}, nullptr, nullptr
+            };
+
+            // Allocate surface and texture
+            orb.spriteSurface = SDL_LoadBMP(orb.icon().c_str());
+            orb.spriteTexture = SDL_CreateTextureFromSurface(
+                renderer, orb.spriteSurface
+            );
+
+            // Add orb to map_set for later deallocation
+            map_set[orb.position()].push_back(orb);
         }
     }
 };
