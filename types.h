@@ -15,7 +15,10 @@
 #include <unordered_map>
 #include <vector>
 
+#define SDL_MAIN_HANDLED
+
 #include "SDL2/include/SDL2/SDL.h"
+#include "SDL2/include/SDL2/SDL_ttf.h"
 
 enum state_t {
     UNKNOWN, DIALOG, TEXT_PROMPT, OPTION_PROMPT, PLAYER_CONTROL
@@ -39,10 +42,12 @@ public:
     }
 
     template <class T>
-    void _log(const T& msg) {
+    void _log(const T& msg, bool fout) {
         now = std::chrono::high_resolution_clock::now();
         auto diff = std::chrono::duration_cast<std::chrono::microseconds>(now - origin);
-        // logfile << "[" << ftick(diff.count()) << "] " << msg << std::endl;
+        if (fout) {
+            logfile << "[" << ftick(diff.count()) << "] " << msg << std::endl;
+        }
         std::cout << "[" << ftick(diff.count()) << "] " << msg << std::endl;
     }
 private:
@@ -86,16 +91,23 @@ struct vec2_t {
         return x == rhs.x && y == rhs.y;
     }
 
-    std::string operator()() {
-        return std::to_string((int)(x + 0.5)) + ',' + std::to_string((int)(y + 0.5));
+    std::string operator()() const {
+        return "(" + std::to_string((int)(x + 0.5)) + ", "
+            + std::to_string((int)(y + 0.5)) + ")";
     }
 
-    vec2_t operator*(double multi) {
-
+    vec2_t operator*(double multi) const {
         return {x * multi, y * multi};
     }
 
-    vec2_t operator+(const vec2_t& rhs) {
+    vec2_t& operator*=(double multi) {
+        x *= multi;
+        y *= multi;
+
+        return *this;
+    }
+
+    vec2_t operator+(const vec2_t& rhs) const {
         return {x + rhs.x, y + rhs.y};
     }
 
@@ -105,11 +117,27 @@ struct vec2_t {
         return *this;
     }
 
-    vec2_t normalize() {
+    vec2_t operator-(const vec2_t& rhs) const {
+        return {x - rhs.x, y - rhs.y};
+    }
+
+    vec2_t& operator-=(const vec2_t& rhs) {
+        x -= rhs.x;
+        y -= rhs.y;
+        return *this;
+    }
+
+    vec2_t normalize() const {
+        if (x == 0 && y == 0) return {0, 0};
+
         return {
-            x / sqrt(x * x + y * y),
-            y / sqrt(x * x + y * y)
+            x / sqrtl(x * x + y * y),
+            y / sqrtl(x * x + y * y)
         };
+    }
+
+    long double magnitude() const {
+        return sqrtl(x * x + y * y);
     }
 };
 
@@ -143,19 +171,30 @@ struct object_t {
     }
 
     vec2_t _position() {
-        return {(int)(position.x + 0.5), (int)(position.y + 0.5)};
+        return {
+            (long double)(int64_t)(position.x + 0.5),
+            (long double)(int64_t)(position.y + 0.5)
+        };
     }
 
     std::array<std::string, 8> icons;
     SDL_Rect spriteRect;
+    SDL_Rect hitboxRect;
     SDL_Surface* spriteSurface;
+    SDL_Surface* hitboxSurface;
     SDL_Texture* spriteTexture;
+    SDL_Texture* hitboxTexture;
 };
 
 struct player_t : public object_t {
     int health;
     int cash;
     vec2_t spawn_point;
+};
+
+struct line_t {
+    vec2_t begin;
+    vec2_t end;
 };
 
 typedef std::unordered_map<

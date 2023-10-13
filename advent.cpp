@@ -5,7 +5,7 @@
 extern bool running;
 extern SDL_Renderer* renderer;
 
-int main(int argc, char** argv) {
+int main() {
     if (sys_start() != 0) return 0;
 
     std::chrono::time_point begin = std::chrono::high_resolution_clock::now();
@@ -22,12 +22,12 @@ int main(int argc, char** argv) {
             ) {
                 process_keypress(event.key);
             } else if (event.type == SDL_MOUSEBUTTONDOWN) {
-                log(
+                print(
                     std::string{"("} + std::to_string(event.button.x) + ", " +
                     std::to_string(event.button.y) + ") Clicked..."
                 );
             } else if (event.type == SDL_MOUSEBUTTONUP) {
-                log(
+                print(
                     std::string{"("} + std::to_string(event.button.x) + ", " +
                     std::to_string(event.button.y) + ") Released..."
                 );

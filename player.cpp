@@ -11,7 +11,12 @@ player_t player { "Bob", SPAWN_POINT, {0, 0}, UP, 256.0, {
         "BMPs/Temp_Player_UpRight.bmp",
         "BMPs/Temp_Player_DownLeft.bmp",
         "BMPs/Temp_Player_DownRight.bmp"
-    }, {0, 0, 64, 64}, nullptr, nullptr, 100, 0, SPAWN_POINT
+    },
+    {0, 0, 64, 64},
+    {0, 0, 32, 32},
+    nullptr, nullptr,
+    nullptr, nullptr,
+    100, 0, SPAWN_POINT
 };
 
 extern std::unordered_map<

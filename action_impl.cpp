@@ -16,7 +16,7 @@ std::unordered_map<
 > func_map = {
     {
         "ADVANCE_DIALOG", [](void) {
-            log("Advancing dialog...");
+            print("Advancing dialog...");
         }
     }, {
         "EXIT", [](void) {
@@ -25,7 +25,7 @@ std::unordered_map<
         }
     }, {
         "MOVE_UP", [](void) {
-            log("Move up...");
+            print("Move up...");
 
             pressed_arr[_UP] = true;
             dir_t old = player.look_direction;
@@ -54,7 +54,7 @@ std::unordered_map<
         }
     }, {
         "MOVE_DOWN", [](void) {
-            log("Move down...");
+            print("Move down...");
 
             pressed_arr[_DOWN] = true;
             dir_t old = player.look_direction;
@@ -84,7 +84,7 @@ std::unordered_map<
         }
     }, {
         "CANCEL_UP", [](void) {
-            log("Stop moving up...");
+            print("Stop moving up...");
 
             pressed_arr[_UP] = false;
             dir_t old = player.look_direction;
@@ -114,7 +114,7 @@ std::unordered_map<
         }
     }, {
         "CANCEL_DOWN", [](void) {
-            log("Stop moving down...");
+            print("Stop moving down...");
 
             pressed_arr[_DOWN] = false;
             dir_t old = player.look_direction;
@@ -144,7 +144,7 @@ std::unordered_map<
         }
     }, {
         "MOVE_LEFT", [](void) {
-            log("Move left...");
+            print("Move left...");
             pressed_arr[_LEFT] = true;
 
             dir_t old = player.look_direction;
@@ -173,7 +173,7 @@ std::unordered_map<
         }
     }, {
         "MOVE_RIGHT", [](void) {
-            log("Move right...");
+            print("Move right...");
             pressed_arr[_RIGHT] = true;
 
             dir_t old = player.look_direction;
@@ -202,7 +202,7 @@ std::unordered_map<
         }
     }, {
         "CANCEL_LEFT", [](void) {
-            log("Stop moving left...");
+            print("Stop moving left...");
 
             pressed_arr[_LEFT] = false;
             dir_t old = player.look_direction;
@@ -232,7 +232,7 @@ std::unordered_map<
         }
     }, {
         "CANCEL_RIGHT", [](void) {
-            log("Stop moving right...");
+            print("Stop moving right...");
 
             pressed_arr[_RIGHT] = false;
             dir_t old = player.look_direction;
@@ -262,7 +262,7 @@ std::unordered_map<
         }
     }, {
         "INTERACT", [](void) {
-            log("Interacting...");
+            print("Interacting...");
         }
     }, {
         "RESPAWN", [](void) {
@@ -285,16 +285,17 @@ std::unordered_map<
         }
     }, {
         "PLACE_ORB", [](void) {
-            log("Placing orb...");
+            print("Placing orb...");
 
             // Generate random valid screen position (rounded to int coords)
             vec2_t pos = {
-                rand() % (WIND_WIDTH - 32),
-                rand() % (WIND_HEIGHT - 32)
+                (long double)(rand() % (int64_t)(WIND_WIDTH - 32)),
+                (long double)(rand() % (int64_t)(WIND_HEIGHT - 32))
             };
 
             // Create object
-            object_t orb {"Orb", pos, {0, 0}, UP, 0.0, {
+            object_t orb {
+                "Orb", pos, {0, 0}, UP, 0.0, {
                     "BMPs/Red_Orb.bmp",
                     "BMPs/Red_Orb.bmp",
                     "BMPs/Red_Orb.bmp",
@@ -303,14 +304,32 @@ std::unordered_map<
                     "BMPs/Red_Orb.bmp",
                     "BMPs/Red_Orb.bmp",
                     "BMPs/Red_Orb.bmp"
-                }, {pos.x, pos.y, 32, 32}, nullptr, nullptr
+                },
+                {(int)pos.x, (int)pos.y, 32, 32},
+                {0, 0, 32, 32},
+                nullptr, nullptr,
+                nullptr, nullptr
             };
 
-            // Allocate surface and texture
+            // Allocate sprite surface and texture
             orb.spriteSurface = SDL_LoadBMP(orb.icon().c_str());
             orb.spriteTexture = SDL_CreateTextureFromSurface(
                 renderer, orb.spriteSurface
             );
+
+            // Allocate hitbox surface and texture
+            orb.hitboxSurface = SDL_CreateRGBSurface(
+                0, 32, 32, 32, 0, 0, 0, 0
+            );
+
+            SDL_FillRect(orb.hitboxSurface, &orb.hitboxRect, 0x000000FF);
+
+            orb.hitboxTexture = SDL_CreateTextureFromSurface(
+                renderer, orb.hitboxSurface
+            );
+
+            orb.hitboxRect.x = (int)pos.x;
+            orb.hitboxRect.y = (int)pos.y;
 
             // Add orb to map_set for later deallocation
             map_set[orb.position()].push_back(orb);
