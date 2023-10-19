@@ -1,4 +1,14 @@
-OBJECTS=action_impl.o advent.o input_map.o input.o system.o text.o player.o map.o
+OBJECTS= \
+	action_impl.o \
+	advent.o \
+	input_map.o \
+	input.o \
+	system.o \
+	text.o \
+	player.o \
+	map.o \
+	npc.o
+
 CXX=g++
 LIBS=./SDL2/lib
 CXXFLAGS=-std=c++2a -Wall -Wextra -pedantic -Wshadow -Wconversion -Werror=vla -Werror=return-type -Wno-deprecated-copy -Wno-multichar -g
@@ -33,6 +43,9 @@ player.o:
 
 map.o:
 	$(CXX) $(CXXFLAGS) -L $(LIBS) map.cpp -c
+
+npc.o:
+	$(CXX) $(CXXFLAGS) -L $(LIBS) npc.cpp -c
 
 clean:
 	@rm *.o advent -f

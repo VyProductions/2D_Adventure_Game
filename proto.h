@@ -37,5 +37,9 @@ void read_inputmap();
 void print_msg(const std::wstring& msg, vec2_t pos, TTF_Font* font);
 
 // Player
+void spawn_player(const std::string& name, const vec2_t& pos);
+
+// NPC
+void spawn_npc(const std::string& name, const vec2_t& pos);
 
 #endif

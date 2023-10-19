@@ -47,6 +47,11 @@ extern std::unordered_map<
 
 extern std::unordered_map<
     std::string,
+    std::list<npc_t>
+> npc_set;
+
+extern std::unordered_map<
+    std::string,
     void (*)(void)
 > func_map;
 
@@ -88,26 +93,11 @@ int sys_start() {
     prog_state = PLAYER_CONTROL;
     running = true;
 
-    // Load player BMP into player surface
-    player.spriteSurface = SDL_LoadBMP(player.icon().c_str());
+    vec2_t plr_pos = vec2_t{0, 0};
+    vec2_t npc_pos = vec2_t{WIND_WIDTH / 2, WIND_HEIGHT / 2};
 
-    // Create texture from player icon
-    player.spriteTexture = SDL_CreateTextureFromSurface(
-        renderer, player.spriteSurface
-    );
-
-    // Allocate player hitbox
-    player.hitboxSurface = SDL_CreateRGBSurface(
-        0, 32, 32, 32, 0, 0, 0, 0
-    );
-
-    SDL_FillRect(player.hitboxSurface, &player.hitboxRect, 0x00FF0000);
-    player.hitboxTexture = SDL_CreateTextureFromSurface(
-        renderer, player.hitboxSurface
-    );
-
-    player.hitboxRect.x = (int)(player.position.x + 0.5) + 16;
-    player.hitboxRect.y = (int)(player.position.y + 0.5) + 16;
+    spawn_player("Bob", plr_pos);
+    spawn_npc("Larry", npc_pos);
 
     begin = std::chrono::high_resolution_clock::now();
 
@@ -133,9 +123,21 @@ void sys_exit() {
         }
     }
 
+    // Free all NPC resources
+    for (auto& [position, npc_list] : npc_set) {
+        for (auto& npc : npc_list) {
+            SDL_FreeSurface(npc.spriteSurface);
+            SDL_DestroyTexture(npc.spriteTexture);
+            SDL_FreeSurface(npc.hitboxSurface);
+            SDL_DestroyTexture(npc.hitboxTexture);
+        }
+    }
+
+    // Free window resources
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
 
+    // Exit
     TTF_Quit();
     SDL_Quit();
 }
@@ -165,6 +167,17 @@ void DrawScreen() {
         }
     }
 
+    // Draw NPCs
+    for (auto& [position, npc_list] : npc_set) {
+        for (auto& npc : npc_list) {
+            // Draw NPC hitbox
+            SDL_RenderCopy(renderer, npc.hitboxTexture, NULL, &npc.hitboxRect);
+
+            // Draw NPC sprite
+            SDL_RenderCopy(renderer, npc.spriteTexture, NULL, &npc.spriteRect);
+        }
+    }
+
     // Draw player hitbox
     SDL_RenderCopy(renderer, player.hitboxTexture, NULL, &player.hitboxRect);
 
@@ -176,7 +189,8 @@ void DrawScreen() {
 
     TTF_Font* font = TTF_OpenFont("Fonts/OverpassMono-Regular.ttf", font_pt);
 
-    print_msg(L"Hello, world!", {0, (long double)(WIND_HEIGHT - font_pt)}, font);
+    std::wstring point_present = L"Points: " + std::to_wstring(player.points);
+    print_msg(point_present, {0, (long double)(WIND_HEIGHT - font_pt)}, font);
 
     TTF_CloseFont(font);
 
@@ -345,6 +359,9 @@ void Update(double deltaTime) {
 
                     // Remove object.
                     iter = obj_list.erase(iter);
+
+                    // Increase player points
+                    player.points++;
                 } else {
                     ++iter;
                 }
@@ -353,4 +370,103 @@ void Update(double deltaTime) {
             }
         }
     }
+
+    print("Collisions with objects done.");
+
+    // Detect collisions between NPCs and player
+    for (auto& [pos, npc_list] : npc_set) {
+        print(pos + " ; " + std::to_string(npc_list.size()));
+        auto iter = npc_list.begin();
+        while (iter != npc_list.end()) {
+            npc_t& npc = *iter;
+            const vec2_t plr_pos = stov(player.position());
+            const vec2_t npc_pos = stov(npc.position());
+
+            print(plr_pos() + " ; " + npc_pos());
+
+            if (
+                !npc.selected &&
+                inter_lineX(
+                    {{plr_pos.x + 16, 0}, {plr_pos.x + 48, 0}},
+                    {{npc_pos.x, 0}, {npc_pos.x + 32, 0}}
+                ) &&
+                inter_lineY(
+                    {{0, plr_pos.y + 16}, {0, plr_pos.y + 48}},
+                    {{0, npc_pos.y}, {0, npc_pos.y + 32}}
+                )
+            ) {
+                print("Collide! Change to white.");
+
+                // Delete current hitbox for recoloring
+                SDL_FreeSurface(npc.hitboxSurface);
+                SDL_DestroyTexture(npc.hitboxTexture);
+
+                print("Resources deleted.");
+
+                // Place hitbox back at 0-0 for correct retexturing
+                npc.hitboxRect.x = 0;
+                npc.hitboxRect.y = 0;
+
+                print("Hitbox pre-adjusted.");
+
+                // Recolor hitbox, generate new texture
+                SDL_FillRect(npc.hitboxSurface, &npc.hitboxRect, 0x00FFFFFF);
+                print("Rect filled.");
+                npc.hitboxTexture = SDL_CreateTextureFromSurface(
+                    renderer, npc.hitboxSurface
+                );
+
+                print("Hitbox recolored.");
+
+                // Replace hitbox at right position
+                npc.hitboxRect.x = (int)(npc_pos.x + 0.5);
+                npc.hitboxRect.y = (int)(npc_pos.y + 0.5);
+
+                print("Hitbox post-adjusted.");
+
+                // Select NPC
+                npc.selected = true;
+
+                print("NPC selected.");
+            } else if (npc.selected) {
+                print("No longer colliding! Change back to green.");
+
+                // Delete current hitbox for recoloring
+                SDL_FreeSurface(npc.hitboxSurface);
+                SDL_DestroyTexture(npc.hitboxTexture);
+
+                print("Resources deleted.");
+
+                // Place hitbox back at 0-0 for correct retexturing
+                npc.hitboxRect.x = 0;
+                npc.hitboxRect.y = 0;
+
+                print("Hitbox pre-adjusted.");
+
+                // Recolor hitbox, generate new texture
+                SDL_FillRect(npc.hitboxSurface, &npc.hitboxRect, 0x0000FF00);
+                print("Rect filled.");
+                npc.hitboxTexture = SDL_CreateTextureFromSurface(
+                    renderer, npc.hitboxSurface
+                );
+
+                print("Hitbox recolored.");
+
+                // Replace hitbox at right position
+                npc.hitboxRect.x = (int)(npc_pos.x + 0.5);
+                npc.hitboxRect.y = (int)(npc_pos.y + 0.5);
+
+                print("Hitbox post-adjusted.");
+
+                // Unselect NPC
+                npc.selected = false;
+
+                print("NPC unselected.");
+            }
+
+            ++iter;
+        }
+    }
+
+    print("Collisions with NPCs done.")
 }

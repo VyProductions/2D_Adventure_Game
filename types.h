@@ -188,7 +188,13 @@ struct object_t {
 
 struct player_t : public object_t {
     int health;
-    int cash;
+    int points;
+    vec2_t spawn_point;
+};
+
+struct npc_t : public object_t {
+    int health;
+    bool selected;
     vec2_t spawn_point;
 };
 
