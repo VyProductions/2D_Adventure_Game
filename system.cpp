@@ -470,3 +470,104 @@ void Update(double deltaTime) {
 
     print("Collisions with NPCs done.")
 }
+
+/// @brief Get coordinate for vertex modified by orientation values
+/// @param i : base coordinate
+/// @param j : 
+/// @param k 
+/// @param mul 
+/// @param offs 
+/// @return 
+inline float modi(int i, int j, float k, int mul) {
+    return (float)i + (float)j * (float)mul * k + (mul == -1 ? (float)j : 0.0f);
+}
+
+void rounded_corner(dir_t orientation, SDL_Rect box, SDL_Color vert_color) {
+    int& w = box.w;
+    int& h = box.h;
+    int& x = box.x;
+    int& y = box.y;
+
+    int mulW;
+    int mulH;
+
+    switch (orientation) {
+        case UP_LEFT:
+            mulW = 1;
+            mulH = 1;
+            break;
+        case UP_RIGHT:
+            mulW = -1;
+            mulH = 1;
+            break;
+        case DOWN_LEFT:
+            mulW = 1;
+            mulH = -1;
+            break;
+        case DOWN_RIGHT:
+            mulW = -1;
+            mulH = -1;
+            break;
+        default:
+            break;
+    }
+
+    SDL_Vertex verts[] = {
+        // Curve Vertices
+        {{modi(x, w, 0.0f, mulW), modi(y, h, 1.0f, mulH)}, vert_color, {1, 1}},
+        {{modi(x, w, 0.0625f, mulW), modi(y, h, 0.5625f, mulH)}, vert_color, {1, 1}},
+        {{modi(x, w, 0.125f, mulW), modi(y, h, 0.375f, mulH)}, vert_color, {1, 1}},
+        {{modi(x, w, 0.234375f, mulW), modi(y, h, 0.234375f, mulH)}, vert_color, {1, 1}},
+        {{modi(x, w, 0.375f, mulW), modi(y, h, 0.125f, mulH)}, vert_color, {1, 1}},
+        {{modi(x, w, 0.5625f, mulW), modi(y, h, 0.0625f, mulH)}, vert_color, {1, 1}},
+        {{modi(x, w, 1.0f, mulW), modi(y, h, 1.0f, mulH)}, vert_color, {1, 1}},
+
+        // Bottom Edge Vertices
+        {{modi(x, w, 0.0625f, mulW), modi(y, h, 1.0f, mulH)}, vert_color, {1, 1}},
+        {{modi(x, w, 0.135f, mulW), modi(y, h, 1.0f, mulH)}, vert_color, {1, 1}},
+        {{modi(x, w, 0.234375f, mulW), modi(y, h, 1.0f, mulH)}, vert_color, {1, 1}},
+
+        // Right Edge Vertices
+        {{modi(x, w, 1.0f, mulW), modi(y, h, 0.0625f, mulH)}, vert_color, {1, 1}},
+        {{modi(x, w, 1.0f, mulW), modi(y, h, 0.135f, mulH)}, vert_color, {1, 1}},
+        {{modi(x, w, 1.0f, mulW), modi(y, h, 0.234375f, mulH)}, vert_color, {1, 1}},
+
+        // Bottom Right Corner
+        {{modi(x, w, 1.0f, mulW), modi(y, h, 1.0f, mulH)}, vert_color, {1, 1}},
+
+        // Interior Points
+        {{modi(x, w, 0.135f, mulW), modi(y, h, 0.5625f, mulH)}, vert_color, {1, 1}},
+        {{modi(x, w, 0.234375f, mulW), modi(y, h, 0.375f, mulH)}, vert_color, {1, 1}},
+        {{modi(x, w, 0.375f, mulW), modi(y, h, 0.234375f, mulH)}, vert_color, {1, 1}},
+        {{modi(x, w, 0.5625f, mulW), modi(y, h, 0.125f, mulH)}, vert_color, {1, 1}}
+    };
+
+    static int indices[] = {
+        0, 1, 7,
+        1, 2, 14,
+        2, 3, 15,
+        3, 4, 16,
+        4, 5, 17,
+        5, 6, 10,
+        1, 7, 8,
+        2, 8, 9,
+        3, 9, 13,
+        4, 16, 12,
+        5, 17, 11,
+        1, 14, 8,
+        2, 15, 9,
+        3, 12, 13,
+        4, 11, 12,
+        5, 10, 11
+    };
+
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    SDL_RenderGeometry(renderer, NULL, verts, 18, indices, 48);
+}
+
+void DrawRoundedWindow(SDL_Rect bounds, int radius, SDL_Color color) {
+    rounded_corner(UP_LEFT, {bounds.x, bounds.y, radius, radius}, color);
+    rounded_corner(UP_RIGHT, {bounds.x + bounds.w - radius, bounds.y, radius, radius}, color);
+    rounded_corner(DOWN_LEFT, {bounds.x, bounds.y + bounds.h - radius, radius, radius}, color);
+    rounded_corner(DOWN_RIGHT, {bounds.x + bounds.w - radius, bounds.y + bounds.h - radius, radius, radius}, color);
+}

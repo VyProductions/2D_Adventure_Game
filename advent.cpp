@@ -38,39 +38,47 @@ int main() {
             }
         }
 
-        end = std::chrono::high_resolution_clock::now();
-        micro_ticks = std::chrono::duration_cast<
-            std::chrono::microseconds
-        >(end - begin).count();
+        SDL_RenderClear(renderer);
+        DrawRoundedWindow({10, 10, 128, 256}, 16, {255, 0, 0, 0});
+        // rounded_corner(UP_LEFT, {10, 10, 16, 16}, {255, 0, 0, 0});
+        // rounded_corner(UP_RIGHT, {26, 10, 16, 16}, {0, 255, 0, 0});
+        // rounded_corner(DOWN_LEFT, {10, 26, 16, 16}, {0, 0, 255, 0});
+        // rounded_corner(DOWN_RIGHT, {26, 26, 16, 16}, {255, 255, 0, 0});
+        SDL_RenderPresent(renderer);
 
-        if ((double)micro_ticks / 1e6 >= 1 / FPS) {
-            Update((double)micro_ticks / 1e6);
-            begin = std::chrono::high_resolution_clock::now();
-            micro_ticks = std::chrono::duration_cast<
-                std::chrono::microseconds
-            >(begin - last_frame).count();
+        // end = std::chrono::high_resolution_clock::now();
+        // micro_ticks = std::chrono::duration_cast<
+        //     std::chrono::microseconds
+        // >(end - begin).count();
 
-            if (avg_FPS == 0.0) {
-                avg_FPS = 1e6 / (double)micro_ticks;
-            } else {
-                avg_FPS = (avg_FPS + 1e6 / (double)micro_ticks) / 2.0;
-            }
+        // if ((double)micro_ticks / 1e6 >= 1 / FPS) {
+        //     Update((double)micro_ticks / 1e6);
+        //     begin = std::chrono::high_resolution_clock::now();
+        //     micro_ticks = std::chrono::duration_cast<
+        //         std::chrono::microseconds
+        //     >(begin - last_frame).count();
 
-            last_frame = std::chrono::high_resolution_clock::now();
-            SDL_RenderClear(renderer);
-            DrawScreen();
-            SDL_RenderPresent(renderer);
-        }
+        //     if (avg_FPS == 0.0) {
+        //         avg_FPS = 1e6 / (double)micro_ticks;
+        //     } else {
+        //         avg_FPS = (avg_FPS + 1e6 / (double)micro_ticks) / 2.0;
+        //     }
 
-        micro_ticks = std::chrono::duration_cast<
-            std::chrono::microseconds
-        >(std::chrono::high_resolution_clock::now() - last_report).count();
+        //     last_frame = std::chrono::high_resolution_clock::now();
+        //     SDL_RenderClear(renderer);
+        //     DrawScreen();
+        //     SDL_RenderPresent(renderer);
+        // }
 
-        if ((double)micro_ticks / 1e6 >= 0.1) {
-            last_report = std::chrono::high_resolution_clock::now();
+        // micro_ticks = std::chrono::duration_cast<
+        //     std::chrono::microseconds
+        // >(std::chrono::high_resolution_clock::now() - last_report).count();
 
-            print("Frames per second: " + std::to_string(avg_FPS));
-        }
+        // if ((double)micro_ticks / 1e6 >= 0.1) {
+        //     last_report = std::chrono::high_resolution_clock::now();
+
+        //     print("Frames per second: " + std::to_string(avg_FPS));
+        // }
     }
 
     sys_exit();

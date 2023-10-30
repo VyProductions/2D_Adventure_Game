@@ -26,6 +26,8 @@ bool pt_in_rectY(const vec2_t& point, const SDL_Rect& rect);
 vec2_t stov(const std::string& pos_str);
 void movePlayer(double deltaTime);
 void Update(double deltaTime);
+void rounded_corner(dir_t orientation, SDL_Rect box, SDL_Color vert_color);
+void DrawRoundedWindow(SDL_Rect bounds, int radius, SDL_Color color);
 
 // Input
 void process_keypress(const SDL_KeyboardEvent& event);
