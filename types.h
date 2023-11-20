@@ -203,6 +203,20 @@ struct line_t {
     vec2_t end;
 };
 
+struct option_t {
+    std::wstring text;
+    SDL_Color text_color;
+    int text_pt;
+    SDL_Rect bounds;
+};
+
+struct menu_t {
+    SDL_Rect bounds;
+    SDL_Color color;
+    int corner_radius;
+    std::list<option_t> options;
+};
+
 typedef std::unordered_map<
     // Input key event
     SDL_Scancode,

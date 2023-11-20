@@ -190,7 +190,13 @@ void DrawScreen() {
     TTF_Font* font = TTF_OpenFont("Fonts/OverpassMono-Regular.ttf", font_pt);
 
     std::wstring point_present = L"Points: " + std::to_wstring(player.points);
-    print_msg(point_present, {0, (long double)(WIND_HEIGHT - font_pt)}, font);
+    int str_w, str_h;
+    TTF_SizeUNICODE(font, (Uint16*)point_present.c_str(), &str_w, &str_h);
+
+    print_msg(
+        point_present, {0, (int)(WIND_HEIGHT - font_pt), str_w, str_h}, font,
+        SDL_Color{0, 255, 255, 0}
+    );
 
     TTF_CloseFont(font);
 
@@ -471,103 +477,214 @@ void Update(double deltaTime) {
     print("Collisions with NPCs done.")
 }
 
-/// @brief Get coordinate for vertex modified by orientation values
-/// @param i : base coordinate
-/// @param j : 
-/// @param k 
-/// @param mul 
-/// @param offs 
-/// @return 
-inline float modi(int i, int j, float k, int mul) {
-    return (float)i + (float)j * (float)mul * k + (mul == -1 ? (float)j : 0.0f);
+/// @brief Draws a rectangular window with circular corners of radius 'radius'
+/// @param bounds : the rectangular boundary of the window
+/// @param radius : the radius in pixels for the corners of the window
+/// @param color  : what color should the window be drawn in
+void DrawRoundedWindow(SDL_Rect bounds, int radius, SDL_Color color) {
 }
 
-void rounded_corner(dir_t orientation, SDL_Rect box, SDL_Color vert_color) {
-    int& w = box.w;
-    int& h = box.h;
-    int& x = box.x;
-    int& y = box.y;
+void DrawElipse(SDL_Rect bound, dir_t dir, SDL_Color color) {
+    float x_rad = (float)bound.w / 2.0f;
+    float y_rad = (float)bound.h / 2.0f;
+    float x_cnt = (float)bound.x + x_rad;
+    float y_cnt = (float)bound.y + y_rad;
 
-    int mulW;
-    int mulH;
-
-    switch (orientation) {
-        case UP_LEFT:
-            mulW = 1;
-            mulH = 1;
-            break;
-        case UP_RIGHT:
-            mulW = -1;
-            mulH = 1;
-            break;
-        case DOWN_LEFT:
-            mulW = 1;
-            mulH = -1;
-            break;
-        case DOWN_RIGHT:
-            mulW = -1;
-            mulH = -1;
-            break;
-        default:
-            break;
-    }
-
-    SDL_Vertex verts[] = {
-        // Curve Vertices
-        {{modi(x, w, 0.0f, mulW), modi(y, h, 1.0f, mulH)}, vert_color, {1, 1}},
-        {{modi(x, w, 0.0625f, mulW), modi(y, h, 0.5625f, mulH)}, vert_color, {1, 1}},
-        {{modi(x, w, 0.125f, mulW), modi(y, h, 0.375f, mulH)}, vert_color, {1, 1}},
-        {{modi(x, w, 0.234375f, mulW), modi(y, h, 0.234375f, mulH)}, vert_color, {1, 1}},
-        {{modi(x, w, 0.375f, mulW), modi(y, h, 0.125f, mulH)}, vert_color, {1, 1}},
-        {{modi(x, w, 0.5625f, mulW), modi(y, h, 0.0625f, mulH)}, vert_color, {1, 1}},
-        {{modi(x, w, 1.0f, mulW), modi(y, h, 1.0f, mulH)}, vert_color, {1, 1}},
-
-        // Bottom Edge Vertices
-        {{modi(x, w, 0.0625f, mulW), modi(y, h, 1.0f, mulH)}, vert_color, {1, 1}},
-        {{modi(x, w, 0.135f, mulW), modi(y, h, 1.0f, mulH)}, vert_color, {1, 1}},
-        {{modi(x, w, 0.234375f, mulW), modi(y, h, 1.0f, mulH)}, vert_color, {1, 1}},
-
-        // Right Edge Vertices
-        {{modi(x, w, 1.0f, mulW), modi(y, h, 0.0625f, mulH)}, vert_color, {1, 1}},
-        {{modi(x, w, 1.0f, mulW), modi(y, h, 0.135f, mulH)}, vert_color, {1, 1}},
-        {{modi(x, w, 1.0f, mulW), modi(y, h, 0.234375f, mulH)}, vert_color, {1, 1}},
-
-        // Bottom Right Corner
-        {{modi(x, w, 1.0f, mulW), modi(y, h, 1.0f, mulH)}, vert_color, {1, 1}},
-
-        // Interior Points
-        {{modi(x, w, 0.135f, mulW), modi(y, h, 0.5625f, mulH)}, vert_color, {1, 1}},
-        {{modi(x, w, 0.234375f, mulW), modi(y, h, 0.375f, mulH)}, vert_color, {1, 1}},
-        {{modi(x, w, 0.375f, mulW), modi(y, h, 0.234375f, mulH)}, vert_color, {1, 1}},
-        {{modi(x, w, 0.5625f, mulW), modi(y, h, 0.125f, mulH)}, vert_color, {1, 1}}
-    };
-
-    static int indices[] = {
-        0, 1, 7,
-        1, 2, 14,
-        2, 3, 15,
-        3, 4, 16,
-        4, 5, 17,
-        5, 6, 10,
-        1, 7, 8,
-        2, 8, 9,
-        3, 9, 13,
-        4, 16, 12,
-        5, 17, 11,
-        1, 14, 8,
-        2, 15, 9,
-        3, 12, 13,
-        4, 11, 12,
-        5, 10, 11
-    };
+    // Convert degrees to radians
+    const float DEG_RAD = (float)M_PI / 180.0f;
+    int sections = (int)(
+        bound.w > bound.h ?
+        roundf((float)bound.h / 8.0f) :
+        roundf((float)bound.w / 8.0f)
+    );
 
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-    SDL_RenderGeometry(renderer, NULL, verts, 18, indices, 48);
-}
+    float dAngle = (90.0f / (float)sections) * DEG_RAD;
+    SDL_Vertex* verts = new SDL_Vertex[4 * sections + 1];
 
-void DrawRoundedWindow(SDL_Rect bounds, int radius, SDL_Color color) {
-    rounded_corner(UP_LEFT, {bounds.x, bounds.y, radius, radius}, color);
-    rounded_corner(UP_RIGHT, {bounds.x + bounds.w - radius, bounds.y, radius, radius}, color);
-    rounded_corner(DOWN_LEFT, {bounds.x, bounds.y + bounds.h - radius, radius, radius}, color);
-    rounded_corner(DOWN_RIGHT, {bounds.x + bounds.w - radius, bounds.y + bounds.h - radius, radius, radius}, color);
+    verts[0] = {{x_cnt, y_cnt}, {0, 255, 255, 0}, {1, 1}};
+
+    // Right-most, Top-most, Left-most, and Bottom-most points of circle edge
+    verts[1] = {{x_cnt + x_rad, y_cnt}, {0, 255, 255, 0}, {1, 1}};
+    verts[sections + 1] = {{x_cnt, y_cnt - y_rad}, {0, 255, 255, 0}, {1, 1}};
+    verts[2 * sections + 1] = {{x_cnt - x_rad, y_cnt}, {0, 255, 255, 0}, {1, 1}};
+    verts[3 * sections + 1] = {{x_cnt, y_cnt + y_rad}, {0, 255, 255, 0}, {1, 1}};
+
+    for (int mult = 1; mult <= sections; ++mult) {
+        // Only compute vertices between start nodes
+        if (mult < sections) {
+            switch (dir) {
+                case UP:
+                    // Quadrant 1
+                    verts[mult + 1] = {
+                        {
+                            x_cnt + x_rad * cosf((float)mult * dAngle),
+                            y_cnt - y_rad * sinf((float)mult * dAngle)
+                        }, {0, 255, 255, 0}, {1, 1}
+                    };
+                case UP_LEFT:  // fall through
+                    // Quadrant 2
+                    verts[sections + mult + 1] = {
+                        {
+                            x_cnt - x_rad * sinf((float)mult * dAngle),
+                            y_cnt - y_rad * cosf((float)mult * dAngle)
+                        }, {0, 255, 255, 0}, {1, 1}
+                    };
+                    break;
+                case LEFT:
+                    // Quadrant 2
+                    verts[sections + mult + 1] = {
+                        {
+                            x_cnt - x_rad * sinf((float)mult * dAngle),
+                            y_cnt - y_rad * cosf((float)mult * dAngle)
+                        }, {0, 255, 255, 0}, {1, 1}
+                    };
+                case DOWN_LEFT:  // fall through
+                    // Quadrant 3
+                    verts[2 * sections + mult + 1] = {
+                        {
+                            x_cnt - x_rad * cosf((float)mult * dAngle),
+                            y_cnt + y_rad * sinf((float)mult * dAngle)
+                        }, {0, 255, 255, 0}, {1, 1}
+                    };
+                    break;
+                case RIGHT:
+                    // Quadrant 4
+                    verts[3 * sections + mult + 1] = {
+                        {
+                            x_cnt + x_rad * sinf((float)mult * dAngle),
+                            y_cnt + y_rad * cosf((float)mult * dAngle)
+                        }, {0, 255, 255, 0}, {1, 1}
+                    };
+                case UP_RIGHT:  // fall through
+                    // Quadrant 1
+                    verts[mult + 1] = {
+                        {
+                            x_cnt + x_rad * cosf((float)mult * dAngle),
+                            y_cnt - y_rad * sinf((float)mult * dAngle)
+                        }, {0, 255, 255, 0}, {1, 1}
+                    };
+                    break;
+                case NIL:
+                    // Quadrant 1
+                    verts[mult + 1] = {
+                        {
+                            x_cnt + x_rad * cosf((float)mult * dAngle),
+                            y_cnt - y_rad * sinf((float)mult * dAngle)
+                        }, {0, 255, 255, 0}, {1, 1}
+                    };
+
+                    // Quadrant 2
+                    verts[sections + mult + 1] = {
+                        {
+                            x_cnt - x_rad * sinf((float)mult * dAngle),
+                            y_cnt - y_rad * cosf((float)mult * dAngle)
+                        }, {0, 255, 255, 0}, {1, 1}
+                    };
+                case DOWN:    // fall through
+                    // Quadrant 3
+                    verts[2 * sections + mult + 1] = {
+                        {
+                            x_cnt - x_rad * cosf((float)mult * dAngle),
+                            y_cnt + y_rad * sinf((float)mult * dAngle)
+                        }, {0, 255, 255, 0}, {1, 1}
+                    };
+                case DOWN_RIGHT:  // fall through
+                    // Quadrant 4
+                    verts[3 * sections + mult + 1] = {
+                        {
+                            x_cnt + x_rad * sinf((float)mult * dAngle),
+                            y_cnt + y_rad * cosf((float)mult * dAngle)
+                        }, {0, 255, 255, 0}, {1, 1}
+                    };
+                    break;
+            }
+        }
+
+        int* tris = nullptr;
+
+        switch (dir) {
+            case UP:
+                tris = new int[6] {
+                    0, mult, mult + 1,
+                    0, sections + mult, sections + mult + 1
+                };
+                SDL_RenderGeometry(renderer, NULL, verts, 4 * sections + 1, tris, 6);
+                break;
+            case UP_LEFT:
+                tris = new int[3] {
+                    0, sections + mult, sections + mult + 1
+                };
+                SDL_RenderGeometry(renderer, NULL, verts, 4 * sections + 1, tris, 3);
+                break;
+            case UP_RIGHT:
+                tris = new int[3] {
+                    0, mult, mult + 1
+                };
+                SDL_RenderGeometry(renderer, NULL, verts, 4 * sections + 1, tris, 3);
+                break;
+            case LEFT:
+                tris = new int[6] {
+                    0, sections + mult, sections + mult + 1,
+                    0, 2 * sections + mult, 2 * sections + mult + 1
+                };
+                SDL_RenderGeometry(renderer, NULL, verts, 4 * sections + 1, tris, 6);
+                break;
+            case RIGHT:
+                tris = new int[6] {
+                    0, mult, mult + 1,
+                    0, 3 * sections + mult, (
+                        mult < sections ?
+                        (3 * sections + mult + 1) % (4 * sections + 1) :
+                        1
+                    )
+                };
+                SDL_RenderGeometry(renderer, NULL, verts, 4 * sections + 1, tris, 6);
+                break;
+            case DOWN_LEFT:
+                tris = new int[3] {
+                    0, 2 * sections + mult, 2 * sections + mult + 1
+                };
+                SDL_RenderGeometry(renderer, NULL, verts, 4 * sections + 1, tris, 3);
+                break;
+            case DOWN_RIGHT:
+                tris = new int[3] {
+                    0, 3 * sections + mult, (
+                        mult < sections ?
+                        (3 * sections + mult + 1) % (4 * sections + 1) :
+                        1
+                    )
+                };
+                SDL_RenderGeometry(renderer, NULL, verts, 4 * sections + 1, tris, 3);
+                break;
+            case DOWN:
+                tris = new int[6] {
+                    0, 2 * sections + mult, 2 * sections + mult + 1,
+                    0, 3 * sections + mult, (
+                        mult < sections ?
+                        (3 * sections + mult + 1) % (4 * sections + 1) :
+                        1
+                    )
+                };
+                SDL_RenderGeometry(renderer, NULL, verts, 4 * sections + 1, tris, 6);
+                break;
+            case NIL:
+                tris = new int[12] {
+                    0, mult, mult + 1,
+                    0, sections + mult, sections + mult + 1,
+                    0, 2 * sections + mult, 2 * sections + mult + 1,
+                    0, 3 * sections + mult, (
+                        mult < sections ?
+                        (3 * sections + mult + 1) % (4 * sections + 1) :
+                        1
+                    )
+                };
+                SDL_RenderGeometry(renderer, NULL, verts, 4 * sections + 1, tris, 12);
+                break;
+        }
+
+        delete [] tris;
+    }
+
+    delete [] verts;  // Free vertex array
 }

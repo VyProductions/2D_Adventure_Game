@@ -26,8 +26,8 @@ bool pt_in_rectY(const vec2_t& point, const SDL_Rect& rect);
 vec2_t stov(const std::string& pos_str);
 void movePlayer(double deltaTime);
 void Update(double deltaTime);
-void rounded_corner(dir_t orientation, SDL_Rect box, SDL_Color vert_color);
 void DrawRoundedWindow(SDL_Rect bounds, int radius, SDL_Color color);
+void DrawElipse(SDL_Rect bound, dir_t dir, SDL_Color color);
 
 // Input
 void process_keypress(const SDL_KeyboardEvent& event);
@@ -36,7 +36,10 @@ void process_keypress(const SDL_KeyboardEvent& event);
 void read_inputmap();
 
 // Text
-void print_msg(const std::wstring& msg, vec2_t pos, TTF_Font* font);
+void print_msg(
+    const std::wstring& msg, SDL_Rect bound, TTF_Font* font,
+    SDL_Color text_color
+);
 
 // Player
 void spawn_player(const std::string& name, const vec2_t& pos);

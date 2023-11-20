@@ -17,6 +17,8 @@ int main() {
     SDL_Event event;
 
     double avg_FPS = 0.0;
+    int cntX = 32;
+    int cntY = 32;
 
     while (running) {
         while (SDL_PollEvent(&event)) {
@@ -38,25 +40,17 @@ int main() {
             }
         }
 
-        SDL_RenderClear(renderer);
-        DrawRoundedWindow({10, 10, 128, 256}, 16, {255, 0, 0, 0});
-        // rounded_corner(UP_LEFT, {10, 10, 16, 16}, {255, 0, 0, 0});
-        // rounded_corner(UP_RIGHT, {26, 10, 16, 16}, {0, 255, 0, 0});
-        // rounded_corner(DOWN_LEFT, {10, 26, 16, 16}, {0, 0, 255, 0});
-        // rounded_corner(DOWN_RIGHT, {26, 26, 16, 16}, {255, 255, 0, 0});
-        SDL_RenderPresent(renderer);
+        end = std::chrono::high_resolution_clock::now();
+        micro_ticks = std::chrono::duration_cast<
+            std::chrono::microseconds
+        >(end - begin).count();
 
-        // end = std::chrono::high_resolution_clock::now();
-        // micro_ticks = std::chrono::duration_cast<
-        //     std::chrono::microseconds
-        // >(end - begin).count();
-
-        // if ((double)micro_ticks / 1e6 >= 1 / FPS) {
+        if ((double)micro_ticks / 1e6 >= 1 / FPS) {
         //     Update((double)micro_ticks / 1e6);
-        //     begin = std::chrono::high_resolution_clock::now();
-        //     micro_ticks = std::chrono::duration_cast<
-        //         std::chrono::microseconds
-        //     >(begin - last_frame).count();
+            begin = std::chrono::high_resolution_clock::now();
+            micro_ticks = std::chrono::duration_cast<
+                std::chrono::microseconds
+            >(begin - last_frame).count();
 
         //     if (avg_FPS == 0.0) {
         //         avg_FPS = 1e6 / (double)micro_ticks;
@@ -65,10 +59,20 @@ int main() {
         //     }
 
         //     last_frame = std::chrono::high_resolution_clock::now();
-        //     SDL_RenderClear(renderer);
+            SDL_RenderClear(renderer);
+            // DrawRoundedWindow({10, 10, 256, 128}, 16, {0, 255, 255, 0});
+            DrawElipse({10, 10, 32, 64}, NIL, {0, 255, 255, 0});
+            DrawElipse({42, 10, 32, 64}, UP, {0, 255, 255, 0});
+            DrawElipse({74, 10, 32, 64}, UP_LEFT, {0, 255, 255, 0});
+            DrawElipse({106, 10, 32, 64}, UP_RIGHT, {0, 255, 255, 0});
+            DrawElipse({138, 10, 32, 64}, LEFT, {0, 255, 255, 0});
+            DrawElipse({170, 10, 32, 64}, RIGHT, {0, 255, 255, 0});
+            DrawElipse({202, 10, 32, 64}, DOWN_LEFT, {0, 255, 255, 0});
+            DrawElipse({234, 10, 32, 64}, DOWN_RIGHT, {0, 255, 255, 0});
+            DrawElipse({276, 10, 32, 64}, DOWN, {0, 255, 255, 0});
         //     DrawScreen();
-        //     SDL_RenderPresent(renderer);
-        // }
+            SDL_RenderPresent(renderer);
+        }
 
         // micro_ticks = std::chrono::duration_cast<
         //     std::chrono::microseconds
