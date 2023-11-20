@@ -502,13 +502,13 @@ void DrawElipse(SDL_Rect bound, dir_t dir, SDL_Color color) {
     float dAngle = (90.0f / (float)sections) * DEG_RAD;
     SDL_Vertex* verts = new SDL_Vertex[4 * sections + 1];
 
-    verts[0] = {{x_cnt, y_cnt}, {0, 255, 255, 0}, {1, 1}};
+    verts[0] = {{x_cnt, y_cnt}, color, {1, 1}};
 
     // Right-most, Top-most, Left-most, and Bottom-most points of circle edge
-    verts[1] = {{x_cnt + x_rad, y_cnt}, {0, 255, 255, 0}, {1, 1}};
-    verts[sections + 1] = {{x_cnt, y_cnt - y_rad}, {0, 255, 255, 0}, {1, 1}};
-    verts[2 * sections + 1] = {{x_cnt - x_rad, y_cnt}, {0, 255, 255, 0}, {1, 1}};
-    verts[3 * sections + 1] = {{x_cnt, y_cnt + y_rad}, {0, 255, 255, 0}, {1, 1}};
+    verts[1] = {{x_cnt + x_rad, y_cnt}, color, {1, 1}};
+    verts[sections + 1] = {{x_cnt, y_cnt - y_rad}, color, {1, 1}};
+    verts[2 * sections + 1] = {{x_cnt - x_rad, y_cnt}, color, {1, 1}};
+    verts[3 * sections + 1] = {{x_cnt, y_cnt + y_rad}, color, {1, 1}};
 
     for (int mult = 1; mult <= sections; ++mult) {
         // Only compute vertices between start nodes
@@ -520,7 +520,7 @@ void DrawElipse(SDL_Rect bound, dir_t dir, SDL_Color color) {
                         {
                             x_cnt + x_rad * cosf((float)mult * dAngle),
                             y_cnt - y_rad * sinf((float)mult * dAngle)
-                        }, {0, 255, 255, 0}, {1, 1}
+                        }, color, {1, 1}
                     };
                 case UP_LEFT:  // fall through
                     // Quadrant 2
@@ -528,7 +528,7 @@ void DrawElipse(SDL_Rect bound, dir_t dir, SDL_Color color) {
                         {
                             x_cnt - x_rad * sinf((float)mult * dAngle),
                             y_cnt - y_rad * cosf((float)mult * dAngle)
-                        }, {0, 255, 255, 0}, {1, 1}
+                        }, color, {1, 1}
                     };
                     break;
                 case LEFT:
@@ -537,7 +537,7 @@ void DrawElipse(SDL_Rect bound, dir_t dir, SDL_Color color) {
                         {
                             x_cnt - x_rad * sinf((float)mult * dAngle),
                             y_cnt - y_rad * cosf((float)mult * dAngle)
-                        }, {0, 255, 255, 0}, {1, 1}
+                        }, color, {1, 1}
                     };
                 case DOWN_LEFT:  // fall through
                     // Quadrant 3
@@ -545,7 +545,7 @@ void DrawElipse(SDL_Rect bound, dir_t dir, SDL_Color color) {
                         {
                             x_cnt - x_rad * cosf((float)mult * dAngle),
                             y_cnt + y_rad * sinf((float)mult * dAngle)
-                        }, {0, 255, 255, 0}, {1, 1}
+                        }, color, {1, 1}
                     };
                     break;
                 case RIGHT:
@@ -554,7 +554,7 @@ void DrawElipse(SDL_Rect bound, dir_t dir, SDL_Color color) {
                         {
                             x_cnt + x_rad * sinf((float)mult * dAngle),
                             y_cnt + y_rad * cosf((float)mult * dAngle)
-                        }, {0, 255, 255, 0}, {1, 1}
+                        }, color, {1, 1}
                     };
                 case UP_RIGHT:  // fall through
                     // Quadrant 1
@@ -562,7 +562,7 @@ void DrawElipse(SDL_Rect bound, dir_t dir, SDL_Color color) {
                         {
                             x_cnt + x_rad * cosf((float)mult * dAngle),
                             y_cnt - y_rad * sinf((float)mult * dAngle)
-                        }, {0, 255, 255, 0}, {1, 1}
+                        }, color, {1, 1}
                     };
                     break;
                 case NIL:
@@ -571,7 +571,7 @@ void DrawElipse(SDL_Rect bound, dir_t dir, SDL_Color color) {
                         {
                             x_cnt + x_rad * cosf((float)mult * dAngle),
                             y_cnt - y_rad * sinf((float)mult * dAngle)
-                        }, {0, 255, 255, 0}, {1, 1}
+                        }, color, {1, 1}
                     };
 
                     // Quadrant 2
@@ -579,7 +579,7 @@ void DrawElipse(SDL_Rect bound, dir_t dir, SDL_Color color) {
                         {
                             x_cnt - x_rad * sinf((float)mult * dAngle),
                             y_cnt - y_rad * cosf((float)mult * dAngle)
-                        }, {0, 255, 255, 0}, {1, 1}
+                        }, color, {1, 1}
                     };
                 case DOWN:    // fall through
                     // Quadrant 3
@@ -587,7 +587,7 @@ void DrawElipse(SDL_Rect bound, dir_t dir, SDL_Color color) {
                         {
                             x_cnt - x_rad * cosf((float)mult * dAngle),
                             y_cnt + y_rad * sinf((float)mult * dAngle)
-                        }, {0, 255, 255, 0}, {1, 1}
+                        }, color, {1, 1}
                     };
                 case DOWN_RIGHT:  // fall through
                     // Quadrant 4
@@ -595,7 +595,7 @@ void DrawElipse(SDL_Rect bound, dir_t dir, SDL_Color color) {
                         {
                             x_cnt + x_rad * sinf((float)mult * dAngle),
                             y_cnt + y_rad * cosf((float)mult * dAngle)
-                        }, {0, 255, 255, 0}, {1, 1}
+                        }, color, {1, 1}
                     };
                     break;
             }
