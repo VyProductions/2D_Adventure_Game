@@ -26,8 +26,9 @@ bool pt_in_rectY(const vec2_t& point, const SDL_Rect& rect);
 vec2_t stov(const std::string& pos_str);
 void movePlayer(double deltaTime);
 void Update(double deltaTime);
-void DrawRoundedWindow(SDL_Rect bounds, int radius, SDL_Color color);
-void DrawElipse(SDL_Rect bound, dir_t dir, SDL_Color color);
+void DrawEllipse(SDL_Rect bound, dir_t dir, SDL_Color color);
+void selectable_press(const vec2_t& mouse_pos);
+void selectable_release(const vec2_t& mouse_pos);
 
 // Input
 void process_keypress(const SDL_KeyboardEvent& event);
@@ -46,5 +47,8 @@ void spawn_player(const std::string& name, const vec2_t& pos);
 
 // NPC
 void spawn_npc(const std::string& name, const vec2_t& pos);
+
+// Window
+void DrawRoundedWindow(SDL_Rect bounds, int radius, SDL_Color color);
 
 #endif

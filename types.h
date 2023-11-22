@@ -210,10 +210,13 @@ struct option_t {
     SDL_Rect bounds;
 };
 
-struct menu_t {
+struct window_t {
     SDL_Rect bounds;
     SDL_Color color;
     int corner_radius;
+};
+
+struct menu_t : public window_t {
     std::list<option_t> options;
 };
 

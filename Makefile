@@ -7,7 +7,8 @@ OBJECTS= \
 	text.o \
 	player.o \
 	map.o \
-	npc.o
+	npc.o \
+	window.o
 
 CXX=g++
 LIBS=./SDL2/lib
@@ -46,6 +47,9 @@ map.o:
 
 npc.o:
 	$(CXX) $(CXXFLAGS) -L $(LIBS) npc.cpp -c
+
+window.o:
+	$(CXX) $(CXXFLAGS) -L $(LIBS) window.cpp -c
 
 clean:
 	@rm *.o advent -f

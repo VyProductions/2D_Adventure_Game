@@ -32,10 +32,20 @@ int main() {
                     std::string{"("} + std::to_string(event.button.x) + ", " +
                     std::to_string(event.button.y) + ") Clicked..."
                 );
+
+                // Did the user just press down on an object?
+                selectable_press(
+                    {(long double)event.button.x, (long double)event.button.y}
+                );
             } else if (event.type == SDL_MOUSEBUTTONUP) {
                 print(
                     std::string{"("} + std::to_string(event.button.x) + ", " +
                     std::to_string(event.button.y) + ") Released..."
+                );
+                
+                // Did the user just release an object?
+                selectable_release(
+                    {(long double)event.button.x, (long double)event.button.y}
                 );
             }
         }
@@ -60,16 +70,7 @@ int main() {
 
         //     last_frame = std::chrono::high_resolution_clock::now();
             SDL_RenderClear(renderer);
-            // DrawRoundedWindow({10, 10, 256, 128}, 16, {0, 255, 255, 0});
-            DrawElipse({10, 10, 32, 64}, NIL, {0, 255, 255, 0});
-            DrawElipse({42, 10, 32, 64}, UP, {0, 255, 255, 0});
-            DrawElipse({74, 10, 32, 64}, UP_LEFT, {0, 255, 255, 0});
-            DrawElipse({106, 10, 32, 64}, UP_RIGHT, {0, 255, 255, 0});
-            DrawElipse({138, 10, 32, 64}, LEFT, {0, 255, 255, 0});
-            DrawElipse({170, 10, 32, 64}, RIGHT, {0, 255, 255, 0});
-            DrawElipse({202, 10, 32, 64}, DOWN_LEFT, {0, 255, 255, 0});
-            DrawElipse({234, 10, 32, 64}, DOWN_RIGHT, {0, 255, 255, 0});
-            DrawElipse({276, 10, 32, 64}, DOWN, {0, 255, 255, 0});
+            DrawRoundedWindow({10, 10, 128, 256}, 16, {255, 0, 0, 0});
         //     DrawScreen();
             SDL_RenderPresent(renderer);
         }

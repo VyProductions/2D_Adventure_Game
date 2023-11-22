@@ -477,14 +477,12 @@ void Update(double deltaTime) {
     print("Collisions with NPCs done.")
 }
 
-/// @brief Draws a rectangular window with circular corners of radius 'radius'
-/// @param bounds : the rectangular boundary of the window
-/// @param radius : the radius in pixels for the corners of the window
-/// @param color  : what color should the window be drawn in
-void DrawRoundedWindow(SDL_Rect bounds, int radius, SDL_Color color) {
-}
-
-void DrawElipse(SDL_Rect bound, dir_t dir, SDL_Color color) {
+/// @brief Draw an ellipsoid within the bounds of the given rectangle
+/// @param bound : rectangle whose edges are tangent to the cardinal sides of
+///     the ellpise
+/// @param dir : which quadrant(s) should be drawn
+/// @param color : what color to draw the ellipse with
+void DrawEllipse(SDL_Rect bound, dir_t dir, SDL_Color color) {
     float x_rad = (float)bound.w / 2.0f;
     float y_rad = (float)bound.h / 2.0f;
     float x_cnt = (float)bound.x + x_rad;
@@ -687,4 +685,12 @@ void DrawElipse(SDL_Rect bound, dir_t dir, SDL_Color color) {
     }
 
     delete [] verts;  // Free vertex array
+}
+
+void selectable_press(const vec2_t& mouse_pos) {
+
+}
+
+void selectable_release(const vec2_t& mouse_pos) {
+
 }
